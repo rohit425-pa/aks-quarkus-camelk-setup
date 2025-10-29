@@ -1,0 +1,34 @@
+openapi: 3.0.0
+info:
+  title: Hello World API
+  version: "1.0"
+paths:
+  /camelpoc:
+    get:
+      summary: Say hello
+      operationId: getHello
+      x-camel-uri: "direct:getHello"
+      responses:
+        '200':
+          description: successful GET
+          content:
+            text/plain:
+              schema:
+                type: string
+    post:
+      summary: Post hello
+      operationId: postHello
+      x-camel-uri: "direct:postHello"
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: successful POST
+          content:
+            text/plain:
+              schema:
+                type: string

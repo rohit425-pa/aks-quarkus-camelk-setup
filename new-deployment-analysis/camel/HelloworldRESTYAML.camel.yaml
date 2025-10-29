@@ -1,0 +1,71 @@
+- route:
+    id: openapi-loader
+    from:
+      uri: rest-openapi:classpath:helloworld.yaml
+      steps:
+        - log:
+            id: log-3714
+            message: ${body}
+- route:
+    id: get-helloworld
+    from:
+      uri: direct:getHello
+      steps:
+        - log:
+            message: "API Response: ${body}"
+        - setHeader:
+            constant: application/json
+            name: Content-Type
+        - setProperty:
+            constant: 1f4a5ed216f14d8f815ae57ba9bd9aa5
+            name: username
+        - setProperty:
+            constant: 6c63e1243557445586BB8fEBD0143Ab7
+            name: password
+        - script:
+            groovy: |
+              def username = exchange.getProperty('username')
+              def password = exchange.getProperty('password')
+              def credentials = username + ':' + password
+              def encoded = java.util.Base64.getEncoder().encodeToString(credentials.getBytes())
+              exchange.getIn().setHeader('Authorization', 'Basic ' + encoded)
+        - removeHeaders:
+            id: removeHeaders-2239
+            pattern: CamelHttp*
+        - to:
+            uri: https://apidv.landolakes.com/v1/enterprise/identity/mylinks/userlinks?userId=sopper81&bridgeEndpoint=true&throwExceptionOnFailure=false
+        - log:
+            message: "Raw API Response: ${body}"
+        
+        # Convert response body to string to ensure it's not treated as binary
+        - convertBodyTo:
+            type: java.lang.String
+            charset: UTF-8
+        
+        # Remove any problematic headers that might cause encoding issues
+        
+        # Set proper response headers for JSON
+        - setHeader:
+            name: Content-Type
+            constant: application/json; charset=utf-8
+        
+        
+        - unmarshal:
+                  json:
+                    library: Jackson   
+        - marshal:
+            json:
+              library: Jackson
+              prettyPrint: true 
+        - log:
+            message: "Final Response to client: ${body}"
+- route:
+    id: post-helloworld
+    from:
+      uri: direct:postHello
+      steps:
+        - log:
+            id: log-1446
+            message: ${body}
+        - transform:
+            simple: "Hello from POST route: ${body}"
