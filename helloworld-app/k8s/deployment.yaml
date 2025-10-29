@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-app
+  labels:
+    app: helloworld-app
+    version: v1.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloworld-app
+  template:
+    metadata:
+      labels:
+        app: helloworld-app
+        version: v1.0
+    spec:
+      containers:
+      - name: helloworld-camel-quarkus
+        image: aksquarkuscamelkwest234.azurecr.io/helloworld-camel-quarkus:v1.0
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: QUARKUS_HTTP_HOST
+          value: "0.0.0.0"
+        - name: QUARKUS_HTTP_PORT
+          value: "8080"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /q/health/live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /q/health/ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /q/health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 30

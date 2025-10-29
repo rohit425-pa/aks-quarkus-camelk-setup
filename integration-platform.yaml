@@ -1,0 +1,18 @@
+apiVersion: camel.apache.org/v1
+kind: IntegrationPlatform
+metadata:
+  labels:
+    app: camel-k
+  name: camel-k
+  namespace: camel-k
+spec:
+  build:
+    registry:
+      address: aksquarkuscamelkwest234.azurecr.io
+      organization: camel-k
+      secret: camel-k-registry
+  traits:
+    container:
+      configuration:
+        imagePullSecrets:
+        - camel-k-registry

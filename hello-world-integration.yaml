@@ -1,0 +1,12 @@
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  name: hello-world
+  namespace: camel-k
+spec:
+  sources:
+  - content: |
+      from('timer:hello?period=10000')
+          .setBody(constant('Hello World from Camel K on AKS!'))
+          .log('${body}')
+    name: hello-world.groovy
